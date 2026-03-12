@@ -8,12 +8,12 @@
 
 ### 1. Основы (Основы Vue)
 
-- [ ] Создание проекта (Vite).
-- [ ] Шаблоны (Templates) и интерполяция.
-- [ ] Реактивность: `data()` и `methods`.
-- [ ] Директивы: `v-bind`, `v-model`, `v-if`/`v-else`, `v-for`, `v-on`.
+- [x] Создание проекта (Vite).
+- [x] Шаблоны (Templates) и интерполяция.
+- [x] Реактивность: `ref()` и функции.
+- [x] Директивы: `v-bind`, `v-if`/`v-else`, `v-on` (базово).
+- [ ] Директивы: `v-model`, `v-for`.
 - [ ] Вычисляемые свойства (Computed properties) и наблюдатели (Watchers).
-- [ ] Стилизация компонентов (Scoped CSS).
 - [ ] Стилизация компонентов (Scoped CSS).
 
 ### 2. Композиция (Composition API)
@@ -195,3 +195,47 @@ app.mount('#app')
 - v-if / v-else / v-show — условный рендеринг
 - v-for — отрисовка списков и таблиц
 - Модификаторы событий — .prevent, .stop, .once, .enter
+
+# Краткая теория: Модификаторы событий
+
+Модификаторы — это специальные суффиксы, которые добавляются к директиве v-on (или @) через точку. Они меняют поведение обработчика событий.
+
+## Основные модификаторы:
+
+### Модификатор Назначение Пример
+
+- .prevent Вызывает event.preventDefault() — отменяет действие по умолчанию @submit.prevent="onSubmit"
+- .stop Вызывает event.stopPropagation() — останавливает всплытие события @click.stop="onClick"
+- .once Событие сработает только один раз @click.once="onClick"
+- .capture Режим capture (событие ловится на фазе погружения) @click.capture="onClick"
+- .self Срабатывает только если событие на самом элементе (не от дочерних) @click.self="onClick"
+- .passive Улучшает производительность скролла @scroll.passive="onScroll"
+
+## Модификаторы клавиш:
+
+### Модификатор Назначение Пример
+
+- .enter Срабатывает при нажатии Enter @keyup.enter="submit"
+- .tab При нажатии Tab @keyup.tab="nextField"
+- .delete Delete или Backspace @keyup.delete="clear"
+- .esc Escape @keyup.esc="closeModal"
+- .space Пробел @keyup.space="playPause"
+- .up/.down/.left/.right Стрелки @keyup.up="moveUp"
+
+## Модификаторы мыши:
+
+### Модификатор Назначение Пример
+
+- .left Левая кнопка мыши @click.left="select"
+- .right Правая кнопка мыши (контекстное меню) @click.right="openMenu"
+- .middle Средняя кнопка мыши @click.middle="openNewTab"
+
+### Можно комбинировать:
+
+```html
+<!-- Enter + Shift -->
+@keyup.enter.shift="submit"
+
+<!-- Prevent + Stop вместе -->
+@click.stop.prevent="handleClick"
+```
