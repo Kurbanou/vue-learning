@@ -167,3 +167,31 @@ app.use(router)
 
 app.mount('#app')
 ```
+
+# Урок: Директивы в Vue (v-bind, v-model, v-if/v-else, v-for, v-on)
+
+## Краткая теория
+
+### Директивы — это специальные атрибуты с префиксом v-, которые добавляют элементам реактивное поведение.
+
+- v-bind : Связывает атрибут с данными :src="imageUrl" или - v-bind:src="imageUrl"
+- v-model - Двустороннее связывание для форм v-model="username"
+- v-on @ Слушает события DOM @click="handleClick"
+- v-if - Условный рендеринг (удаляет элемент) v-if="isVisible"
+- v-else - Иначе (должен идти сразу после v-if) v-else
+- v-else-if - Дополнительное условие v-else-if="condition"
+- v-show - Условный рендеринг (прячет через CSS) v-show="isVisible"
+- v-for - Рендеринг списков v-for="item in items" :key="item.id"
+- v-html - Вставляет сырой HTML (осторожно, XSS!) v-html="rawHtml"
+- v-text - То же что {{ }}, но для целого элемента v-text="message"
+- v-pre - Пропускает компиляцию для этого элемента v-pre
+- v-cloak - Скрывает нескомпилированный шаблон v-cloak
+
+### Основные методы, которые нужно освоить:
+
+- v-bind — динамические атрибуты (src, href, class, style)
+- v-on — обработка событий (click, input, submit, keyup)
+- v-model — работа с формами (input, select, textarea, checkbox)
+- v-if / v-else / v-show — условный рендеринг
+- v-for — отрисовка списков и таблиц
+- Модификаторы событий — .prevent, .stop, .once, .enter
