@@ -50,7 +50,7 @@ export default defineConfig({
 ## Откройте файл src/main.js и обновите его:
 
 ```js
-import './assets/main.css'
+// import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
@@ -60,6 +60,7 @@ import router from './router'
 
 // 👇 1. Импортируем все иконки
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import 'element-plus/dist/index.css'
 
 const app = createApp(App)
 
