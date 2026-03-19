@@ -302,3 +302,118 @@ ElMessage.info('Информация')
 - **`:deep(selector)`:** Позволяет стилизовать дочерние компоненты.
 - **`:slotted(selector)`:** Стили для контента в слотах.
 - **`:global(selector)`:** Глобальные стили внутри scoped-блока.
+
+## Итоги по 2 часть
+
+## Computed (вычисляемые свойства)
+
+### Базовый синтаксис
+
+```js
+const totalMovies = computed(() => movies.value.length)
+```
+
+### Фильтрация с computed
+
+```js
+//пример для сайта фильмов гле есть фильтр по поиску и фильтр радио
+const filteredMovies = computed(() => {
+  // Поиск имеет приоритет
+  if (searchQuery.value) {
+    return movies.value.filter((m) =>
+      m.title.toLowerCase().includes(searchQuery.value.toLowerCase()),
+    )
+  }
+
+  // Если поиска нет — фильтр по радио
+  if (filter.value === 'watched') {
+    return movies.value.filter((m) => m.watched)
+  } else if (filter.value === 'unwatched') {
+    return movies.value.filter((m) => !m.watched)
+  }
+
+  return movies.value
+})
+```
+
+### Статистика через computed
+
+```js
+// Средний рейтинг
+const averageRating = computed(() => {
+  if (movies.value.length === 0) return 0
+  const sum = movies.value.reduce((acc, m) => acc + m.rating, 0)
+  return (sum / movies.value.length).toFixed(1)
+})
+
+// Лучший фильм
+const bestMovie = computed(() => {
+  return movies.value.reduce((best, current) => (current.rating > best.rating ? current : best))
+})
+```
+
+## 👀 Watch (наблюдатели)
+
+### Автосохранение в localStorage
+
+```js
+watch(
+  movies,
+  () => {
+    localStorage.setItem('movies', JSON.stringify(movies.value))
+  },
+  { deep: true },
+)
+```
+
+### Загрузка из localStorage
+
+```js
+onMounted(() => {
+  const saved = localStorage.getItem('movies')
+  if (saved) {
+    movies.value = JSON.parse(saved)
+  }
+})
+```
+
+### Уведомление при событии
+
+```js
+watch(
+  movies,
+  (newMovies) => {
+    const lastMovie = newMovies[newMovies.length - 1]
+    if (lastMovie?.rating === 10) {
+      ElMessage.success('Шедевр! 🏆')
+    }
+  },
+  { deep: true },
+)
+```
+
+## 💾 localStorage
+
+### Сохранить данные
+
+```js
+localStorage.setItem('key', JSON.stringify(data))
+```
+
+### Прочитать данные
+
+```js
+const data = JSON.parse(localStorage.getItem('key'))
+```
+
+### Удалить данные
+
+```js
+localStorage.removeItem('key')
+```
+
+### Очистить всё
+
+```js
+localStorage.clear()
+```
