@@ -1,13 +1,42 @@
 <script setup>
-import { computed, ref } from 'vue'
-import { Search } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { computed, ref, watch } from 'vue'
 
-const movies = ref([
+const savedMovies = JSON.parse(localStorage.getItem('movies')) || [
   { id: 1, title: 'Начало', rating: 9, watched: true },
   { id: 2, title: 'Матрица', rating: 10, watched: true },
   { id: 3, title: 'Интерстеллар', rating: 8, watched: false },
   { id: 4, title: 'Дюна', rating: 7, watched: false },
-])
+]
+
+const movies = ref(savedMovies)
+
+const prevMovies = ref(JSON.parse(JSON.stringify(movies.value)))
+
+watch(
+  movies,
+  (newMovies) => {
+    // Сохраняем в localStorage
+    localStorage.setItem('movies', JSON.stringify(newMovies))
+
+    // Сравниваем с предыдущей копией
+    if (prevMovies.value.length > 0) {
+      for (let i = 0; i < newMovies.length; i++) {
+        const newMovie = newMovies[i]
+        const oldMovie = prevMovies.value.find((m) => m.id === newMovie.id)
+
+        if (oldMovie && oldMovie.rating !== newMovie.rating && newMovie.rating === 10) {
+          ElMessage.success(`Шедевр! 🏆 ${newMovie.title} получил 10!`)
+        }
+      }
+    }
+
+    // Обновляем предыдущее состояние
+    prevMovies.value = JSON.parse(JSON.stringify(newMovies))
+  },
+  { deep: true },
+)
+
 const newMovie = ref({
   id: null,
   title: '',
@@ -24,27 +53,17 @@ const addFilm = () => {
   newMovie.value.title = ''
 }
 
-const filter = ref('')
-const searchQuery = ref('')
-const filteredMovie = computed(() => {
-  // фильтр по поиску
-  if (searchQuery.value.length > 0) {
-    let result = movies.value.filter((m) =>
-      m.title.toLocaleLowerCase().includes(searchQuery.value.toLocaleLowerCase()),
-    )
-    return result
+const totalMovies = computed(() => movies.value.length)
+const totalWatched = computed(() => movies.value.filter((m) => m.watched).length)
+const midleRate = computed(() => {
+  if (!movies.value && movies.value.length === 0) {
+    return 0
   }
-  // фильтр по радио
+  const rate = movies.value.reduce((acc, movie) => {
+    return acc + movie.rating || 0
+  }, 0)
 
-  if (filter.value === 'watched') {
-    let result = movies.value.filter((m) => m.watched)
-    return result
-  } else if (filter.value === 'unwatched') {
-    let result = movies.value.filter((m) => !m.watched)
-    return result
-  }
-
-  return movies.value
+  return rate / movies.value.length
 })
 </script>
 <template>
@@ -59,29 +78,18 @@ const filteredMovie = computed(() => {
       </el-col>
     </el-row>
 
-    <!-- Блок управления отображением поиск и фильтрация -->
-    <el-row :gutter="20" style="margin-bottom: 40px">
-      <el-col :span="12">
-        <el-input
-          v-model.lazy="searchQuery"
-          placeholder="Please Input"
-          :suffix-icon="Search"
-        ></el-input>
-      </el-col>
-      <el-col :span="12">
-        <el-radio-group v-model="filter">
-          <el-radio value="all">all</el-radio>
-          <el-radio value="watched">watched</el-radio>
-          <el-radio value="unwatched">unwatched</el-radio>
-        </el-radio-group>
-      </el-col>
+    <!-- Статистика -->
+
+    <el-row :gutter="20">
+      <el-col :span="8" :xs="24">Все фильмов: {{ totalMovies }}</el-col>
+      <el-col :span="8" :xs="24">Просмотренно фильмов: {{ totalWatched }}</el-col>
+      <el-col :span="8" :xs="24">Средний рейтинг фильмов: {{ midleRate }}</el-col>
     </el-row>
 
     <!-- Отображаем фильмы -->
 
-    <div>{{ searchQuery }}</div>
     <div v-if="movies.length > 0">
-      <el-row :gutter="20" v-for="m in filteredMovie" :key="m.id" class="list_movies">
+      <el-row :gutter="20" v-for="m in movies" :key="m.id" class="list_movies">
         <el-col :span="8"
           ><el-tag type="primary">rate</el-tag> <el-rate v-model="m.rating" :max="10"></el-rate
         ></el-col>
