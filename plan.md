@@ -12,19 +12,17 @@
 
 - [x] Создание проекта (Vite).
 - [x] Шаблоны (Templates) и интерполяция.
-- [x] Реактивность: `ref()` и функции.
 - [x] Директивы: `v-bind`, `v-if`/`v-else`, `v-on` (базово).
 - [x] Директивы: `v-model`, `v-for`.
-- [ ] Вычисляемые свойства (Computed properties) и наблюдатели (Watchers).
-- [ ] Стилизация компонентов (Scoped CSS).
+- [x] Стилизация компонентов (Scoped CSS).
 
 ### 2. Композиция (Composition API)
 
-- [ ] Знакомство с `<script setup>`.
-- [ ] Реактивность: `ref()` и `reactive()`.
-- [ ] Вычисляемые свойства: `computed()`.
-- [ ] Наблюдатели: `watch()` и `watchEffect()`.
-- [ ] Хуки жизненного цикла (Lifecycle Hooks) в Composition API.
+- [x] Знакомство с `<script setup>`.
+- [x] Реактивность: `ref()` и `reactive()`.
+- [x] Вычисляемые свойства: `computed()`.
+- [x] Наблюдатели: `watch()` и `watchEffect()`.
+- [x] Хуки жизненного цикла (Lifecycle Hooks) в Composition API.
 - [ ] Создание переиспользуемой логики (Композаблы - Composables).
 
 ### 3. Компоненты и взаимодействие
