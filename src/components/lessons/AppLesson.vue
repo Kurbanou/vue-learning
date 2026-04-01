@@ -1,113 +1,104 @@
 <script setup>
+import { computed, ref } from 'vue'
+import { useLocalStorage } from '@/composables/useLocalStorage'
 import { ElMessage } from 'element-plus'
-import { computed, ref, watch } from 'vue'
+import MovieCard from '@/components/MovieCard.vue' // 👈 импортируем
 
-const savedMovies = JSON.parse(localStorage.getItem('movies')) || [
+const { data: movies } = useLocalStorage('movies', [
   { id: 1, title: 'Начало', rating: 9, watched: true },
   { id: 2, title: 'Матрица', rating: 10, watched: true },
   { id: 3, title: 'Интерстеллар', rating: 8, watched: false },
   { id: 4, title: 'Дюна', rating: 7, watched: false },
-]
+])
 
-const movies = ref(savedMovies)
+const newMovie = ref({ title: '' })
 
-const prevMovies = ref(JSON.parse(JSON.stringify(movies.value)))
+// Функции-обработчики событий от MovieCard
+const updateRating = (id, newRating) => {
+  const movie = movies.value.find((m) => m.id === id)
+  if (movie) movie.rating = newRating
+}
 
-watch(
-  movies,
-  (newMovies) => {
-    // Сохраняем в localStorage
-    localStorage.setItem('movies', JSON.stringify(newMovies))
+const updateWatched = (id) => {
+  const movie = movies.value.find((m) => m.id === id)
+  if (movie) movie.watched = !movie.watched
+}
 
-    // Сравниваем с предыдущей копией
-    if (prevMovies.value.length > 0) {
-      for (let i = 0; i < newMovies.length; i++) {
-        const newMovie = newMovies[i]
-        const oldMovie = prevMovies.value.find((m) => m.id === newMovie.id)
+const deleteMovie = (id) => {
+  const deletedMovie = movies.value.find((m) => m.id === id)
+  movies.value = movies.value.filter((m) => m.id !== id)
+  ElMessage.success(`Фильм "${deletedMovie?.title}" удалён`)
+}
 
-        if (oldMovie && oldMovie.rating !== newMovie.rating && newMovie.rating === 10) {
-          ElMessage.success(`Шедевр! 🏆 ${newMovie.title} получил 10!`)
-        }
-      }
-    }
-
-    // Обновляем предыдущее состояние
-    prevMovies.value = JSON.parse(JSON.stringify(newMovies))
-  },
-  { deep: true },
-)
-
-const newMovie = ref({
-  id: null,
-  title: '',
-  rating: 0,
-})
 const addFilm = () => {
-  if (!newMovie.value.title) return
+  if (!newMovie.value.title.trim()) {
+    ElMessage.warning('Введите название фильма')
+    return
+  }
   movies.value.push({
     id: crypto.randomUUID(),
     title: newMovie.value.title,
-    rating: 0,
+    rating: 5,
     watched: false,
   })
   newMovie.value.title = ''
+  ElMessage.success('Фильм добавлен')
 }
 
+// Статистика
 const totalMovies = computed(() => movies.value.length)
 const totalWatched = computed(() => movies.value.filter((m) => m.watched).length)
 const midleRate = computed(() => {
-  if (!movies.value && movies.value.length === 0) {
-    return 0
-  }
-  const rate = movies.value.reduce((acc, movie) => {
-    return acc + movie.rating || 0
-  }, 0)
-
-  return rate / movies.value.length
+  if (movies.value.length === 0) return 0
+  const sum = movies.value.reduce((acc, m) => acc + m.rating, 0)
+  return (sum / movies.value.length).toFixed(1)
 })
 </script>
+
 <template>
   <div class="container">
-    <!-- Добавляем новый фильм -->
+    <!-- Форма добавления -->
     <el-row style="margin-bottom: 40px" justify="center">
       <el-col :span="8">
         <el-form @submit.prevent="addFilm">
-          <el-input v-model="newMovie.title" placeholder="input movie title"></el-input>
-          <el-button @click="addFilm" type="primary">add film</el-button>
+          <el-input v-model="newMovie.title" placeholder="Название фильма" />
+          <el-button @click="addFilm" type="primary">Добавить</el-button>
         </el-form>
       </el-col>
     </el-row>
 
     <!-- Статистика -->
-
-    <el-row :gutter="20">
-      <el-col :span="8" :xs="24">Все фильмов: {{ totalMovies }}</el-col>
-      <el-col :span="8" :xs="24">Просмотренно фильмов: {{ totalWatched }}</el-col>
-      <el-col :span="8" :xs="24">Средний рейтинг фильмов: {{ midleRate }}</el-col>
+    <el-row :gutter="20" style="margin-bottom: 30px">
+      <el-col :span="8" :xs="24">
+        <el-statistic title="Всего фильмов" :value="totalMovies" />
+      </el-col>
+      <el-col :span="8" :xs="24">
+        <el-statistic title="Просмотрено" :value="totalWatched" />
+      </el-col>
+      <el-col :span="8" :xs="24">
+        <el-statistic title="Средний рейтинг" :value="midleRate" :precision="1" />
+      </el-col>
     </el-row>
 
-    <!-- Отображаем фильмы -->
-
+    <!-- Список фильмов -->
     <div v-if="movies.length > 0">
-      <el-row :gutter="20" v-for="m in movies" :key="m.id" class="list_movies">
-        <el-col :span="8"
-          ><el-tag type="primary">rate</el-tag> <el-rate v-model="m.rating" :max="10"></el-rate
-        ></el-col>
-        <el-col :span="8"
-          ><el-tag type="info" effect="plain">title: {{ m.title }}</el-tag></el-col
-        >
-        <el-col :span="8" @click.stop="m.watched = !m.watched"
-          ><el-tag :type="m.watched ? 'success' : 'danger'" effect="plain"
-            >watched: {{ m.watched === true ? 'yes' : 'no' }}</el-tag
-          ></el-col
-        >
-      </el-row>
+      <MovieCard
+        v-for="movie in movies"
+        :key="movie.id"
+        :movie="movie"
+        @update:rating="updateRating"
+        @update:watched="updateWatched"
+        @delete="deleteMovie"
+      />
+    </div>
+    <div v-else>
+      <el-empty description="Фильмов пока нет" />
     </div>
   </div>
 </template>
 
 <style scoped>
-:global(.container) {
+.container {
   width: 100%;
   max-width: 1240px;
   padding: 0 20px;
@@ -117,21 +108,5 @@ const midleRate = computed(() => {
 .el-form {
   display: flex;
   gap: 20px;
-}
-
-.list_movies .el-col {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-:global(.el-input__suffix) {
-  cursor: pointer;
-}
-
-@media (max-width: 768px) {
-  :global(.container) {
-    padding: 0 10px;
-  }
 }
 </style>
