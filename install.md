@@ -56,30 +56,49 @@ EOF
 rm -rf app
 ```
 
-## 1 Создай файл assets/css/element-override.css
+## 1 Создай файл assets/scss/element-variables.scss
 
 ```css
+/* sassets/scss/element-variables.scss */
 :root {
-  /* Основной цвет */
-  --el-color-primary: #4b8df8;
-
-  /* Скругления */
-  --el-border-radius-base: 10px;
-
-  /* Размер шрифта */
-  --el-font-size-base: 15px;
-
-  /* Цвет кнопки */
-  --el-button-bg-color: #4b8df8;
-  --el-button-text-color: #fff;
+  --el-color-primary: #409eff;
+  --el-color-success: #d335bc;
+  --el-color-warning: #e6a23c;
+  --el-color-danger: #f56c6c;
 }
 ```
 
-## 2 Подключи его в nuxt.config.ts
+```bash
+npm install -D sass sass-loader
+npm add -D @element-plus/nuxt element-plus sass-embedded
+```
+
+## Настройка nuxt.config.ts
 
 ```js
+// nuxt.config.ts
 export default defineNuxtConfig({
   modules: ["@element-plus/nuxt"],
-  css: ["element-plus/dist/index.css", "@/assets/css/element-override.css"],
+
+  elementPlus: {
+    icon: "ElIcon",
+    importStyle: "scss", // Включаем SCSS режим
+  },
+
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          // Ваш файл с переменными будет добавлен ко всем компонентам Element Plus
+          additionalData: `@use "@/assets/scss/element-variables.scss" as *;`,
+        },
+      },
+    },
+  },
+
+  css: [
+    // Опционально: если нужны глобальные стили
+    // '@/assets/scss/global.scss',
+  ],
 });
 ```

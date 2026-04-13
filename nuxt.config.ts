@@ -1,9 +1,25 @@
+// nuxt.config.ts
 export default defineNuxtConfig({
-  modules: ['@element-plus/nuxt'],
+  modules: ["@element-plus/nuxt"],
+
   elementPlus: {
-    importStyle: 'css',
-    icon: 'ElIcon'
+    icon: "ElIcon",
+    importStyle: "scss", // Включаем SCSS режим
   },
-  // Это заставит Nuxt искать страницы в корневой /pages
-  srcDir: './'
-})
+
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          // Ваш файл с переменными будет добавлен ко всем компонентам Element Plus
+          additionalData: `@use "@/assets/scss/element-variables.scss" as *;`,
+        },
+      },
+    },
+  },
+
+  css: [
+    // Опционально: если нужны глобальные стили
+    // '@/assets/scss/global.scss',
+  ],
+});
