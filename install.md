@@ -5,119 +5,53 @@
 ## Создание проекта Nuxt
 
 ```bash
-npx nuxi init имя проекта     # Создаем проект
-cd nuxt-learning
-npm install                     # Устанавливаем зависимости
-npm install element-plus @element-plus/icons-vue
-mkdir -p app/components app/pages app/layouts app/plugins app/composables app/utils #Создание папок структуры
-npm run dev                     # Запускаем проект
+# Инициализация (используем --force и --shell для чистоты)
+npx nuxi@latest init my-nuxt-app --package-manager npm --no-git --no-install
 
-```
+cd my-nuxt-app
 
-## Установка Element Plus
+# Точка указывает, что нужно развернуть файлы прямо здесь если каталог уже есть
+npx nuxi@latest init . --force --package-manager npm --no-git
 
-```bash
-npm install element-plus
-npm install @element-plus/icons-vue
+# Установка Element Plus и иконок
+npm install element-plus @element-plus/nuxt @element-plus/icons-vue
 
-```
+# Создаем папки
+mkdir -p pages layouts components assets/css
 
-### Создание плагина Element Plus
-
-Создай файл:
-
-/plugins/element-plus.client.ts
-.client.ts - потому что Element Plus работает только на клиенте и это предотвращает SSR‑ошибки.
-
-```js
-import ElementPlus from "element-plus";
-import "element-plus/dist/index.css";
-import * as ElementPlusIconsVue from "@element-plus/icons-vue";
-
-export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.vueApp.use(ElementPlus);
-
-  // Регистрируем иконки глобально
-  for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-    nuxtApp.vueApp.component(key, component);
-  }
-});
-```
-
-### Автоимпорт Element Plus (опционально)
-
-```bash
-npm install -D unplugin-vue-components unplugin-auto-import
-```
-
-Добавь в корневой файл nuxt.config.ts
-
-```js
-// nuxt.config.ts
-import { defineNuxtConfig } from "nuxt/config";
-
+# Настраиваем чистый nuxt.config.ts
+cat <<EOF > nuxt.config.ts
 export default defineNuxtConfig({
-  srcDir: "app/",
-  compatibilityDate: "2025-07-15",
-  devtools: { enabled: true },
-
-  // Другой способ настройки автоимпорта
-  modules: ["@nuxt/devtools"],
-
-  css: ["element-plus/dist/index.css"],
-
-  build: {
-    transpile: ["element-plus"],
+  modules: ['@element-plus/nuxt'],
+  elementPlus: {
+    importStyle: 'css',
+    icon: 'ElIcon'
   },
-});
-```
+  // Это заставит Nuxt искать страницы в корневой /pages
+  srcDir: './'
+})
+EOF
 
-## Запуск проекта
+# Создаем базовый app.vue
+cat <<EOF > app.vue
+<template>
+  <div>
+    <NuxtPage />
+  </div>
+</template>
+EOF
 
-```bash
-npm run dev
-```
+# Создаем тестовую страницу
+cat <<EOF > pages/index.vue
+<template>
+  <div style="padding: 50px;">
+    <el-button type="success" round>
+      <el-icon class="el-icon--left"><el-icon-check /></el-icon>
+      Проект готов!
+    </el-button>
+  </div>
+</template>
+EOF
 
-## Структура проекта
-
-```bash
-# В терминале (из корня проекта):
-# Перейти в папку проекта
-cd app
-# Теперь создавать структуру
-mkdir pages components layouts composables utils
-touch pages/index.vue
-touch components/MyButton.vue
-touch layouts/default.vue
-```
-
-```text
-nuxt-learning/
-├── .nuxt/
-├── app/                 # <-- твоя srcDir папка
-│   ├── components/
-│   │   └── ElementTest.vue
-│   ├── layouts/
-│   │   └── default.vue
-│   ├── pages/
-│   │   └── index.vue
-│   ├── plugins/
-│   │   └── element-plus.client.ts
-│   └── app.vue
-├── node_modules/
-├── public/
-├── nuxt.config.ts
-├── package.json
-└── tsconfig.json
-```
-
-в nuxt.config.ts
-
-```js
-// https://nuxt.com/docs/api/configuration/nuxt-config
-export default defineNuxtConfig({
-  srcDir: "app/", // <-- ОБЯЗАТЕЛЬНО: это связывает конфиг с вашей папкой
-  compatibilityDate: "2025-07-15",
-  devtools: { enabled: true },
-});
+rm -rf app
 ```
