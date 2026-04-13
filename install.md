@@ -6,21 +6,48 @@
 
 ```bash
 # Инициализация (используем --force и --shell для чистоты)
-npx nuxi@latest init my-nuxt-app --package-manager npm --no-git --no-install
+npx nuxi init my-nuxt-app --no-git --no-install --package-manager npm--no-install
 
 cd my-nuxt-app
 
 # Точка указывает, что нужно развернуть файлы прямо здесь если каталог уже есть
-npx nuxi@latest init . --force --package-manager npm --no-git
+npx nuxi@latest init . --force --package-manager npm --no-git --no-install
+```
 
+## Остальной код
+
+```bash
 # Установка Element Plus и иконок
 npm install element-plus @element-plus/nuxt @element-plus/icons-vue
 
 # Создаем папки
 mkdir -p pages layouts components assets/scss
 
-# Настраиваем чистый nuxt.config.ts
-cat <<EOF > nuxt.config.ts
+# Создаем базовый app.vue
+cat <<EOF > app.vue
+<template>
+  <div>
+    <NuxtPage />
+  </div>
+</template>
+EOF
+
+# Создаем тестовую страницу
+cat <<EOF > pages/index.vue
+<template>
+  <div style="padding: 50px;">
+    <el-button type="success" round>
+      <el-icon class="el-icon--left"><el-icon-check /></el-icon>
+      Проект готов!
+    </el-button>
+  </div>
+</template>
+EOF
+```
+
+## Настраиваем чистый nuxt.config.ts
+
+```js
 // nuxt.config.ts
 export default defineNuxtConfig({
   modules: ["@element-plus/nuxt"],
@@ -46,32 +73,12 @@ export default defineNuxtConfig({
     // '@/assets/scss/global.scss',
   ],
 });
-EOF
+```
 
-# Создаем базовый app.vue
-cat <<EOF > app.vue
-<template>
-  <div>
-    <NuxtPage />
-  </div>
-</template>
-EOF
+## Создаем кастомные переменные стилей
 
-# Создаем тестовую страницу
-cat <<EOF > pages/index.vue
-<template>
-  <div style="padding: 50px;">
-    <el-button type="success" round>
-      <el-icon class="el-icon--left"><el-icon-check /></el-icon>
-      Проект готов!
-    </el-button>
-  </div>
-</template>
-EOF
-
-# Создаем кастомные переменные стилей
-cat <<EOF > assets/scss/element-variables.scss
-/* sassets/scss/element-variables.scss */
+```scss
+/* assets/scss/element-variables.scss */
 /* ================================
    Modern Clean Theme for Element+
    ================================ */
@@ -142,8 +149,9 @@ $--menu-item-hover-fill: #f5f7ff;
 /* Диалоги */
 $--dialog-border-radius: 14px;
 $--dialog-padding-primary: 24px;
-EOF
+```
 
+```bash
 rm -rf app
 npm install -D sass sass-embedded
 npm run dev
