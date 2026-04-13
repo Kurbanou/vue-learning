@@ -8,6 +8,8 @@
 npx nuxi init имя проекта     # Создаем проект
 cd nuxt-learning
 npm install                     # Устанавливаем зависимости
+npm install element-plus @element-plus/icons-vue
+mkdir -p app/components app/pages app/layouts app/plugins app/composables app/utils #Создание папок структуры
 npm run dev                     # Запускаем проект
 
 ```
@@ -51,21 +53,21 @@ npm install -D unplugin-vue-components unplugin-auto-import
 Добавь в корневой файл nuxt.config.ts
 
 ```js
+// nuxt.config.ts
 import { defineNuxtConfig } from "nuxt/config";
-import Components from "unplugin-vue-components/vite";
-import AutoImport from "unplugin-auto-import/vite";
-import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
 
 export default defineNuxtConfig({
-  vite: {
-    plugins: [
-      AutoImport({
-        resolvers: [ElementPlusResolver()],
-      }),
-      Components({
-        resolvers: [ElementPlusResolver()],
-      }),
-    ],
+  srcDir: "app/",
+  compatibilityDate: "2025-07-15",
+  devtools: { enabled: true },
+
+  // Другой способ настройки автоимпорта
+  modules: ["@nuxt/devtools"],
+
+  css: ["element-plus/dist/index.css"],
+
+  build: {
+    transpile: ["element-plus"],
   },
 });
 ```
@@ -80,6 +82,9 @@ npm run dev
 
 ```bash
 # В терминале (из корня проекта):
+# Перейти в папку проекта
+cd app
+# Теперь создавать структуру
 mkdir pages components layouts composables utils
 touch pages/index.vue
 touch components/MyButton.vue
@@ -87,30 +92,32 @@ touch layouts/default.vue
 ```
 
 ```text
-my-app/
-├── pages/                # Страницы (файловая маршрутизация)
-│   ├── index.vue         # Главная страница (localhost:3000/)
-│   ├── about.vue         # Страница /about
-│   └── posts/
-│       └── [id].vue      # Динамический роут /posts/1, /posts/2
-├── components/           # Vue-компоненты
-│   ├── Header.vue
-│   ├── Footer.vue
-│   └── Chat/
-│       └── Message.vue
-├── layouts/              # Макеты страниц
-│   ├── default.vue       # Используется по умолчанию
-│   └── admin.vue         # Для админки
-├── composables/          # Автоматически импортируемые хуки (useState, useFetch и ваши)
-│   └── useCounter.ts
-├── utils/                # Вспомогательные функции
-│   └── formatDate.ts
-├── server/               # Серверная часть (API, middleware, routes)
-│   └── api/
-│       └── hello.get.ts  # API эндпоинт /api/hello
-├── public/               # Статика (изображения, robots.txt)
-│   └── images/
-├── app.vue               # Корневой компонент (оставляем, но обычно пустой)
-├── nuxt.config.ts        # Конфиг Nuxt
-└── package.json
+nuxt-learning/
+├── .nuxt/
+├── app/                 # <-- твоя srcDir папка
+│   ├── components/
+│   │   └── ElementTest.vue
+│   ├── layouts/
+│   │   └── default.vue
+│   ├── pages/
+│   │   └── index.vue
+│   ├── plugins/
+│   │   └── element-plus.client.ts
+│   └── app.vue
+├── node_modules/
+├── public/
+├── nuxt.config.ts
+├── package.json
+└── tsconfig.json
+```
+
+в nuxt.config.ts
+
+```js
+// https://nuxt.com/docs/api/configuration/nuxt-config
+export default defineNuxtConfig({
+  srcDir: "app/", // <-- ОБЯЗАТЕЛЬНО: это связывает конфиг с вашей папкой
+  compatibilityDate: "2025-07-15",
+  devtools: { enabled: true },
+});
 ```
