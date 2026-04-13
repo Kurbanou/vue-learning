@@ -1,4 +1,4 @@
-[⬅️ На главную](./README.md) | [⚙️ Установка](./install.md) | [📋 План](./plan.md)
+[⬅️ На главную](./MY_README.md) | [⚙️ Установка](./install.md) | [📋 План](./plan.md)
 
 # Обучение Nuxt 3 + Vue 3
 
