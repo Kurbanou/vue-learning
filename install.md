@@ -55,3 +55,31 @@ EOF
 
 rm -rf app
 ```
+
+## 1 Создай файл assets/css/element-override.css
+
+```css
+:root {
+  /* Основной цвет */
+  --el-color-primary: #4b8df8;
+
+  /* Скругления */
+  --el-border-radius-base: 10px;
+
+  /* Размер шрифта */
+  --el-font-size-base: 15px;
+
+  /* Цвет кнопки */
+  --el-button-bg-color: #4b8df8;
+  --el-button-text-color: #fff;
+}
+```
+
+## 2 Подключи его в nuxt.config.ts
+
+```js
+export default defineNuxtConfig({
+  modules: ["@element-plus/nuxt"],
+  css: ["element-plus/dist/index.css", "@/assets/css/element-override.css"],
+});
+```
