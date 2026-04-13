@@ -1,5 +1,0 @@
-<script setup></script>
-<template>
-  <app-lesson />
-</template>
-<style scoped></style>
